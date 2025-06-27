@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: Shispon
+      changes:
+        - createTable:
+            tableName: users_roles
+            schemaName: cards
+            columns:
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            columnNames: user_id, role_id
+            tableName: users_roles
+            schemaName: cards
+            constraintName: pk_users_roles
+
+        - addForeignKeyConstraint:
+            baseTableName: users_roles
+            baseColumnNames: user_id
+            baseTableSchemaName: cards
+            referencedTableName: users
+            referencedColumnNames: id
+            referencedTableSchemaName: cards
+            constraintName: fk_users_roles_user_id
+
+        - addForeignKeyConstraint:
+            baseTableName: users_roles
+            baseColumnNames: role_id
+            baseTableSchemaName: cards
+            referencedTableName: roles
+            referencedColumnNames: id
+            referencedTableSchemaName: cards
+            constraintName: fk_users_roles_role_id
