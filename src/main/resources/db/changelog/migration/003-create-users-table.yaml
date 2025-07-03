@@ -14,6 +14,18 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
+                  name: mail
+                  type: text
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: user_name
+                  type: text
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
                   name: password
                   type: text
                   constraints:

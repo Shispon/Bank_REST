@@ -1,7 +1,10 @@
 package com.example.bankcards.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +18,7 @@ import java.util.UUID;
 public class Card {
 
     @Id
+    @GeneratedValue(generator = "uuid2")
     @Column(name = "id", columnDefinition = "uuid")
     private UUID id;
 
@@ -33,7 +37,6 @@ public class Card {
 
     @Column(name = "created_at", columnDefinition = "timestamp default current_timestamp", insertable = false, updatable = false)
     private LocalDateTime createdAt;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

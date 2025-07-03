@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserCardDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository; // Репозиторий для работы с БД
+    private final UserRepository userRepository;
 
     public UserCardDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -21,11 +21,11 @@ public class UserCardDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByFullName(username)
+        User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return new org.springframework.security.core.userdetails.User(
-                user.getFullName(),
+                user.getUserName(),
                 user.getPassword(),
                 user.getRoles().stream()
                         .map(role -> new SimpleGrantedAuthority(role.getName()))

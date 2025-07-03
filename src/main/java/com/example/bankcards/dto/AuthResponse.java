@@ -12,7 +12,7 @@ import java.util.UUID;
 public class AuthResponse {
     private String token;
     private UUID userId;
-    private String fullName;
+    private String userName;
     private Set<Role> roles;
 }
 

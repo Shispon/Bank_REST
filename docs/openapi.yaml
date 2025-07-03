@@ -1,1 +1,521 @@
-# Здесь будет OpenAPI описание всех доступных эндпоинтов и моделей данных.
+openapi: 3.0.3
+info:
+  title: API для Админки и Пользователя
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Описание модели карты с пользователем (пример полей)
+    CardDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        number:
+          type: string
+          example: "1234 5678 9012 3456"
+        balance:
+          type: number
+          format: double
+          example: 1000.50
+        userId:
+          type: string
+          format: uuid
+          example: "c4f4e6a0-2e44-4d6f-9d8f-123456789abc"
+      required:
+        - number
+        - balance
+
+    # Карта без информации о пользователе
+    CardDTOWithoutUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        number:
+          type: string
+          example: "1234 5678 9012 3456"
+        balance:
+          type: number
+          format: double
+          example: 1000.50
+      required:
+        - id
+        - number
+        - balance
+
+    # Модель для обновления карты (например, можно повторить CardDTO)
+    CardDTOUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        number:
+          type: string
+          example: "1234 5678 9012 3456"
+        balance:
+          type: number
+          format: double
+          example: 2000.00
+      required:
+        - id
+
+    # Пользователь
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "c4f4e6a0-2e44-4d6f-9d8f-123456789abc"
+        username:
+          type: string
+          example: "ivanov"
+        email:
+          type: string
+          format: email
+          example: "ivanov@example.com"
+        fullName:
+          type: string
+          example: "Иван Иванов"
+      required:
+        - username
+        - email
+        - fullName
+
+    # Транзакция
+    TransactionDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "789e1234-b56a-4cde-9123-456789abcdef"
+        fromCardId:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        toCardId:
+          type: string
+          format: uuid
+          example: "456e7890-f12a-4bcd-8123-987654321abc"
+        amount:
+          type: number
+          format: double
+          example: 250.75
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-07-03T12:00:00Z"
+      required:
+        - id
+        - fromCardId
+        - toCardId
+        - amount
+        - timestamp
+
+security:
+  - bearerAuth: []
+
+paths:
+
+  # --- AdminController ---
+
+  /admin/createCard:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Создать новую карту
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardDTO'
+      responses:
+        '201':
+          description: Карта успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDTO'
+        '400':
+          description: Ошибка в данных запроса
+
+  /admin/getCardById:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получить карту по ID
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Карта найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDTOWithoutUser'
+        '404':
+          description: Карта не найдена
+
+  /admin/updateCard:
+    put:
+      security:
+        - bearerAuth: []
+      summary: Обновить карту
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardDTO'
+      responses:
+        '200':
+          description: Карта обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDTOUpdate'
+        '400':
+          description: Ошибка в данных
+
+  /admin/deleteCard:
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удалить карту по ID
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Карта удалена
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Карта не найдена
+
+  /admin/getAllCardsByUser:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получить все карты пользователя по ID
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список карт пользователя
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDTOWithoutUser'
+
+  /admin/createUser:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Создать нового пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+      responses:
+        '200':
+          description: Пользователь создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '400':
+          description: Ошибка в данных
+
+  /admin/findUserById:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Найти пользователя по ID
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Пользователь найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '404':
+          description: Пользователь не найден
+
+  /admin/updateUser:
+    put:
+      security:
+        - bearerAuth: []
+      summary: Обновить пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+      responses:
+        '200':
+          description: Пользователь обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '400':
+          description: Ошибка в данных
+
+  /admin/deleteUser:
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Удалить пользователя по ID
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Пользователь удалён
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Пользователь не найден
+
+  /admin/getAllUsers:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получить список всех пользователей
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDTO'
+
+  /admin/getAllTransactionsByUser:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получить все транзакции пользователя по ID
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список транзакций пользователя
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionDTO'
+        '404':
+          description: Транзакции не найдены
+
+  /admin/approveRequestOfBlocked:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Одобрить запрос на блокировку карты
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: cardId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: request
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Результат одобрения запроса
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  # --- UserController ---
+
+  /user/getAllCardsOfUser:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Получить все карты пользователя по userId
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список карт пользователя
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDTOWithoutUser'
+        '404':
+          description: Карты не найдены
+
+  /user/createBlockRequest:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Создать запрос на блокировку карты
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: cardId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: reason
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Результат создания запроса
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Ошибка при создании запроса
+
+  /user/createTransaction:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Создать транзакцию перевода денег
+      parameters:
+        - name: cardFromId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: cardToId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: amount
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: Результат перевода
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Ошибка при переводе денег
+
+  /user/checkBalance:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Проверить баланс карты пользователя
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: cardId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Баланс карты
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: Пользователь или карта не найдены

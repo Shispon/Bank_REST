@@ -14,8 +14,13 @@ import java.util.UUID;
 public class Transaction {
 
     @Id
+    @GeneratedValue(generator = "uuid2")
     @Column(name = "id", columnDefinition = "uuid")
     private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_card_id")
@@ -30,4 +35,5 @@ public class Transaction {
 
     @Column(name = "timestamp", columnDefinition = "timestamp default current_timestamp", insertable = false, updatable = false)
     private LocalDateTime timestamp;
+
 }

@@ -1,16 +1,11 @@
 package com.example.bankcards.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,8 +21,15 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @Column(name = "id", columnDefinition = "uuid")
+    @GeneratedValue(generator = "uuid2")
+    @Column(name = "id", columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
+
+    @Column(name = "mail", nullable = false, columnDefinition = "text")
+    private String mail;
+
+    @Column(name = "user_name", nullable = false, columnDefinition = "text")
+    private String userName;
 
     @Column(name = "password", nullable = false, columnDefinition = "text")
     private String password;
@@ -41,7 +43,7 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @ManyToMany(fetch = FetchType.EAGER)  // При загрузке пользователя сразу загружаем роли
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
             schema = "cards",

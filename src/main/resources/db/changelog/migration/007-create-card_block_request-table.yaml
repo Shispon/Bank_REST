@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: 5
+      id: 6
       author: Shispon
       changes:
         - createTable:
-            tableName: transactions
+            tableName: card_block_request
             schemaName: cards
             columns:
               - column:
@@ -14,51 +14,41 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
+                  name: card_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
                   name: user_id
                   type: uuid
                   constraints:
                     nullable: false
               - column:
-                  name: from_card_id
-                  type: uuid
+                  name: reason
+                  type: text
+              - column:
+                  name: status
+                  type: text
                   constraints:
                     nullable: false
               - column:
-                  name: to_card_id
-                  type: uuid
-                  constraints:
-                    nullable: false
-              - column:
-                  name: amount
-                  type: decimal(15,2)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: timestamp
+                  name: created_at
                   type: timestamp
                   defaultValueComputed: current_timestamp
 
         - addForeignKeyConstraint:
-            baseTableName: transactions
+            baseTableName: card_block_request
+            baseColumnNames: card_id
+            baseTableSchemaName: cards
+            referencedTableName: cards
+            referencedColumnNames: id
+            referencedTableSchemaName: cards
+            constraintName: fk_card_block_request_from_card
+        - addForeignKeyConstraint:
+            baseTableName: card_block_request
             baseColumnNames: user_id
             baseTableSchemaName: cards
             referencedTableName: users
             referencedColumnNames: id
             referencedTableSchemaName: cards
-            constraintName: fk_transactions_from_user
-        - addForeignKeyConstraint:
-            baseTableName: transactions
-            baseColumnNames: from_card_id
-            baseTableSchemaName: cards
-            referencedTableName: cards
-            referencedColumnNames: id
-            referencedTableSchemaName: cards
-            constraintName: fk_transactions_from_card
-        - addForeignKeyConstraint:
-            baseTableName: transactions
-            baseColumnNames: to_card_id
-            baseTableSchemaName: cards
-            referencedTableName: cards
-            referencedColumnNames: id
-            referencedTableSchemaName: cards
-            constraintName: fk_transactions_to_card
+            constraintName: fk_card_block_request_from_user

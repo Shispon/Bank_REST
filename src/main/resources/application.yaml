@@ -26,3 +26,7 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+
+card:
+  encryption:
+    secret: 1234567890123456

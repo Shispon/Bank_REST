@@ -15,12 +15,13 @@ public class UserMapper {
 
         User user = new User();
         user.setId(userDTO.getId());
+        user.setMail(userDTO.getMail());
+        user.setUserName(userDTO.getUserName());
         user.setPassword(userDTO.getPassword());
         user.setFullName(userDTO.getFullName());
         user.setActive(userDTO.isActive());
         user.setCreatedAt(userDTO.getCreatedAt());
 
-        // Преобразуем список UUID ролей в Set<Role>
         if (userDTO.getRoles() != null) {
             Set<Role> roles = userDTO.getRoles().stream()
                     .map(roleId -> {
@@ -40,6 +41,8 @@ public class UserMapper {
 
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
+        userDTO.setMail(user.getMail());
+        userDTO.setUserName(user.getUserName());
         userDTO.setFullName(user.getFullName());
         userDTO.setPassword(user.getPassword());
         userDTO.setActive(user.isActive());
